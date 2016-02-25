@@ -1,6 +1,6 @@
 = Spring Cloud Stream Script Transform Processor
 
-A *Spring Cloud Stream* module that transforms messages using a script.
+A *Spring Cloud Stream* module that transforms messages using a script. The language of the script can be specified.
 
 == Requirements
 
@@ -8,13 +8,13 @@ A *Spring Cloud Stream* module that transforms messages using a script.
 
 == Code Tour
 
-GroovyTransformProcessorApplication:: the Spring Boot Main Application
-GroovyTransformProcessor:: the actual module code that interacts with message channels
-GroovyTransformProcessorProperties:: defines the configuration properties that are available to the Groovy Transform Processor
-  * script: reference to a script used to transform messages
+ScriptTransformProcessorApplication:: the Spring Boot Main Application
+ScriptTransformProcessor:: the actual module code that interacts with message channels
+ScriptTransformProcessorProperties:: defines the configuration properties that are available to the Script Transform Processor
+  * script: the textual form of the script to run
+  * language: what language is the script? e.g. groovy/javascript (default groovy)
   * variables: variable bindings as a comma delimited string of name-value pairs, e.g. 'foo=bar,baz=car'
   * variablesLocation: the location of a properties file containing custom script variable bindings
-
 
 ## Building with Maven
 
@@ -25,5 +25,5 @@ $> mvn package
 ## Running the Application
 
 ```
-$> java -jar target/groovy-transform-processor-${version}-exec.jar
+$> java -jar target/script-transform-processor-${version}-exec.jar
 ```

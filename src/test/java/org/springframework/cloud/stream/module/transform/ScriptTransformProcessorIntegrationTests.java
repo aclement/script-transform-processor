@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 the original author or authors.
+ * Copyright 2015-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,11 +34,12 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * Integration Tests for the Groovy Transform Processor.
+ * Integration Tests for the Script Transform Processor.
  *
  * @author Eric Bottard
  * @author Marius Bogoevici
  * @author Artem Bilan
+ * @author Andy Clement
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = ScriptTransformProcessorApplication.class)
@@ -61,11 +62,47 @@ public abstract class ScriptTransformProcessorIntegrationTests {
 	public static class UsingScriptIntegrationTests extends ScriptTransformProcessorIntegrationTests {
 
 		@Test
-		public void test() {
+		public void testGroovyBasic() {
 			channels.input().send(new GenericMessage<Object>("hello world"));
 			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is("hello WORLD")));
 		}
 
 	}
+
+	@WebIntegrationTest({"script=\"payload+foo\"", "variables=limit=5\\n foo=\\\\\40WORLD"})
+	public static class UsingScriptIntegrationTests2 extends ScriptTransformProcessorIntegrationTests {
+
+		@Test
+		public void testGroovyAlternative() {
+			channels.input().send(new GenericMessage<Object>("hello world"));
+			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is("hello world WORLD")));
+		}
+
+	}
+	
+
+	@WebIntegrationTest({"script=\"payload+foo\"", "language=js", "variables=limit=5\\n foo=\\\\\40WORLD"})
+	public static class UsingScriptIntegrationTests3 extends ScriptTransformProcessorIntegrationTests {
+
+		@Test
+		public void testJavaScript() {
+			channels.input().send(new GenericMessage<Object>("hello world"));
+			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is("hello world WORLD")));
+		}
+
+	}
+	
+
+	@WebIntegrationTest({"script=\"function add(a,b) { return a+b;}; add(1,3)\"", "language=js", "variables=limit=5\\n foo=\\\\\40WORLD"})
+	public static class UsingScriptIntegrationTests4 extends ScriptTransformProcessorIntegrationTests {
+
+		@Test
+		public void testJavaScriptFunctions() {
+			channels.input().send(new GenericMessage<Object>("hello world"));
+			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is(4L)));
+		}
+
+	}
+
 
 }

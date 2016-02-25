@@ -16,8 +16,6 @@
 
 package org.springframework.cloud.stream.module.transform;
 
-import java.io.IOException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.annotation.EnableBinding;
@@ -26,11 +24,12 @@ import org.springframework.cloud.stream.module.common.ScriptVariableGeneratorCon
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.integration.annotation.Transformer;
-import org.springframework.integration.groovy.GroovyScriptExecutingMessageProcessor;
 import org.springframework.integration.handler.MessageProcessor;
+import org.springframework.integration.scripting.ScriptExecutor;
 import org.springframework.integration.scripting.ScriptVariableGenerator;
+import org.springframework.integration.scripting.jsr223.ScriptExecutingMessageProcessor;
+import org.springframework.integration.scripting.jsr223.ScriptExecutorFactory;
 import org.springframework.scripting.ScriptSource;
-import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.scripting.support.StaticScriptSource;
 
 /**
@@ -56,14 +55,10 @@ public class ScriptTransformProcessor {
 	@Transformer(inputChannel = Processor.INPUT, outputChannel = Processor.OUTPUT)
 	public MessageProcessor<?> transformer() {
 		String quotedScript = properties.getScript();
-		ScriptSource scriptSource = new StaticScriptSource(quotedScript.substring(1,quotedScript.length()-1),"Gscript");
-		try {
-			System.out.println(scriptSource.getScriptAsString());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return new GroovyScriptExecutingMessageProcessor(scriptSource, scriptVariableGenerator);
+		// assert quoted! "..."
+		ScriptSource scriptSource = new StaticScriptSource(quotedScript.substring(1,quotedScript.length()-1),"scripy");		
+		ScriptExecutor scriptExecutor = ScriptExecutorFactory.getScriptExecutor(properties.getLanguage());		
+		return new ScriptExecutingMessageProcessor(scriptSource, scriptVariableGenerator, scriptExecutor);				
 	}
 
 }

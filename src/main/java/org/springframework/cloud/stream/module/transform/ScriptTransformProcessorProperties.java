@@ -19,10 +19,9 @@ package org.springframework.cloud.stream.module.transform;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.core.io.Resource;
 
 /**
- * Configuration properties for the Groovy Transform Processor module.
+ * Configuration properties for the Script Transform Processor module.
  *
  * @author Eric Bottard
  * @author Andy Clement
@@ -30,7 +29,7 @@ import org.springframework.core.io.Resource;
 @ConfigurationProperties
 public class ScriptTransformProcessorProperties {
 
-	private String language;
+	private String language = "groovy";
 	
 	private String script;
 

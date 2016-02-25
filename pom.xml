@@ -2,10 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>groovy-transform-processor</artifactId>
+	<artifactId>script-transform-processor</artifactId>
 	<packaging>jar</packaging>
-	<name>Groovy Transform Processor</name>
-	<description>Groovy Transform Processor stream module</description>
+	<name>Script Transform Processor</name>
+	<description>Script Transform Processor stream module</description>
 
 	<parent>
 		<groupId>org.springframework.cloud.stream.module</groupId>
@@ -14,7 +14,7 @@
 	</parent>
 
 	<properties>
-		<start-class>org.springframework.cloud.stream.module.transform.GroovyTransformProcessorApplication</start-class>
+		<start-class>org.springframework.cloud.stream.module.transform.ScriptTransformProcessorApplication</start-class>
 	</properties>
 
 	<dependencies>
