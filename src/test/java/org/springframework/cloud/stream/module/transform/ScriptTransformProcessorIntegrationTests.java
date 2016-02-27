@@ -22,7 +22,6 @@ import static org.springframework.cloud.stream.test.matcher.MessageQueueMatcher.
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.WebIntegrationTest;
@@ -54,11 +53,7 @@ public abstract class ScriptTransformProcessorIntegrationTests {
 	@Autowired
 	protected MessageCollector collector;
 	
-	// 1. make test pass when supplying script as inline text
-	// 2. make it work when specifying script format
-	// 3. support other formats
-	
-	@WebIntegrationTest({"script=\"payload.substring(0, limit as int) + foo\"", "variables=limit=5\\n foo=\\\\\40WORLD"})
+	@WebIntegrationTest({"script=payload.substring(0, limit as int) + foo", "variables=limit=5\\n foo=\\\\\40WORLD"})
 	public static class UsingScriptIntegrationTests extends ScriptTransformProcessorIntegrationTests {
 
 		@Test
@@ -69,7 +64,7 @@ public abstract class ScriptTransformProcessorIntegrationTests {
 
 	}
 
-	@WebIntegrationTest({"script=\"payload+foo\"", "variables=limit=5\\n foo=\\\\\40WORLD"})
+	@WebIntegrationTest({"script=payload+foo", "variables=limit=5\\n foo=\\\\\40WORLD"})
 	public static class UsingScriptIntegrationTests2 extends ScriptTransformProcessorIntegrationTests {
 
 		@Test
@@ -81,7 +76,7 @@ public abstract class ScriptTransformProcessorIntegrationTests {
 	}
 	
 
-	@WebIntegrationTest({"script=\"payload+foo\"", "language=js", "variables=limit=5\\n foo=\\\\\40WORLD"})
+	@WebIntegrationTest({"script=payload+foo", "language=js", "variables=limit=5\\n foo=\\\\\40WORLD"})
 	public static class UsingScriptIntegrationTests3 extends ScriptTransformProcessorIntegrationTests {
 
 		@Test
@@ -93,7 +88,7 @@ public abstract class ScriptTransformProcessorIntegrationTests {
 	}
 	
 
-	@WebIntegrationTest({"script=\"function add(a,b) { return a+b;}; add(1,3)\"", "language=js", "variables=limit=5\\n foo=\\\\\40WORLD"})
+	@WebIntegrationTest({"script=function add(a,b) { return a+b;}; add(1,3)", "language=js", "variables=limit=5\\n foo=\\\\\40WORLD"})
 	public static class UsingScriptIntegrationTests4 extends ScriptTransformProcessorIntegrationTests {
 
 		@Test

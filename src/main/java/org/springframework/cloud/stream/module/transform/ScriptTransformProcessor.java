@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.stream.module.transform;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.stream.annotation.EnableBinding;
@@ -45,6 +47,8 @@ import org.springframework.scripting.support.StaticScriptSource;
 @EnableConfigurationProperties(ScriptTransformProcessorProperties.class)
 public class ScriptTransformProcessor {
 
+	private static Logger logger = LoggerFactory.getLogger(ScriptTransformProcessor.class);
+
 	@Autowired
 	private ScriptVariableGenerator scriptVariableGenerator;
 
@@ -54,9 +58,9 @@ public class ScriptTransformProcessor {
 	@Bean
 	@Transformer(inputChannel = Processor.INPUT, outputChannel = Processor.OUTPUT)
 	public MessageProcessor<?> transformer() {
-		String quotedScript = properties.getScript();
-		// assert quoted! "..."
-		ScriptSource scriptSource = new StaticScriptSource(quotedScript.substring(1,quotedScript.length()-1),"scripy");		
+		String script = properties.getScript();
+		logger.info("script is '{}'",script);
+		ScriptSource scriptSource = new StaticScriptSource(properties.getScript());
 		ScriptExecutor scriptExecutor = ScriptExecutorFactory.getScriptExecutor(properties.getLanguage());		
 		return new ScriptExecutingMessageProcessor(scriptSource, scriptVariableGenerator, scriptExecutor);				
 	}
