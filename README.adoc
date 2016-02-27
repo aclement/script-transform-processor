@@ -37,9 +37,9 @@ XD> module register --name scripty --coordinates org.springframework.cloud.strea
 ## Using in a Spring Cloud Dataflow stream definition
 
 ```
-stream create --deploy true --name demo --definition "time | scripty --script=\"return payload+'::'+payload\" | log"
+XD> stream create --deploy true --name demo --definition "time | scripty --script=\"return payload+'::'+payload\" | log"
 ```
 
 ```
-stream create --deploy true --name demo2 --definition "time | scripty --script=\"function double(a) { return a+''+a;} double(payload);\" --language=js | log"
+XD> stream create --deploy true --name demo2 --definition "time | scripty --script=\"function double(a) { return a+''+a;} double(payload);\" --language=js | log"
 ```
