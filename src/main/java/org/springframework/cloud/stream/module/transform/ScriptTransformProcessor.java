@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.stream.module.transform;
 
+import java.util.regex.Matcher;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +48,9 @@ import org.springframework.scripting.support.StaticScriptSource;
 @Import(ScriptVariableGeneratorConfiguration.class)
 @EnableConfigurationProperties(ScriptTransformProcessorProperties.class)
 public class ScriptTransformProcessor {
-
+	
+	private static final String NEWLINE_ESCAPE = Matcher.quoteReplacement("\\n");
+	
 	private static Logger logger = LoggerFactory.getLogger(ScriptTransformProcessor.class);
 
 	@Autowired
@@ -58,11 +62,15 @@ public class ScriptTransformProcessor {
 	@Bean
 	@Transformer(inputChannel = Processor.INPUT, outputChannel = Processor.OUTPUT)
 	public MessageProcessor<?> transformer() {
-		String script = properties.getScript();
+		String script = decodedScript(properties.getScript());
 		logger.info("script is '{}'",script);
-		ScriptSource scriptSource = new StaticScriptSource(properties.getScript());
+		ScriptSource scriptSource = new StaticScriptSource(script);
 		ScriptExecutor scriptExecutor = ScriptExecutorFactory.getScriptExecutor(properties.getLanguage());		
 		return new ScriptExecutingMessageProcessor(scriptSource, scriptVariableGenerator, scriptExecutor);				
+	}
+	
+	private static String decodedScript(String script) {
+		return script.replaceAll(NEWLINE_ESCAPE, "\n");
 	}
 
 }
