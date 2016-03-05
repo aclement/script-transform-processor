@@ -16,10 +16,10 @@ ScriptTransformProcessorProperties:: defines the configuration properties that a
   * variables: variable bindings as a comma delimited string of name-value pairs, e.g. 'foo=bar,baz=car'
   * variablesLocation: the location of a properties file containing custom script variable bindings
 
-## Building with Maven
+## Building/Installing with Maven
 
 ```
-$> mvn package
+$> mvn -s .settings.xml clean install
 ```
 
 ## Running the Application
