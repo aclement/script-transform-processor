@@ -31,15 +31,15 @@ $> java -jar target/script-transform-processor-${version}-exec.jar
 ## Installing in Spring Cloud Dataflow
 
 ```
-XD> module register --name scripty --coordinates org.springframework.cloud.stream.module:script-transform-processor:jar:exec:1.0.0.BUILD-SNAPSHOT --type processor
+XD> module register --name scriptable --coordinates org.springframework.cloud.stream.module:script-transform-processor:jar:exec:1.0.0.BUILD-SNAPSHOT --type processor
 ```
 
 ## Using in a Spring Cloud Dataflow stream definition
 
 ```
-XD> stream create --deploy true --name demo --definition "time | scripty --script=\"return payload+'::'+payload\" | log"
+XD> stream create --deploy true --name demo --definition "time | scriptable --script=\"return payload+'::'+payload\" | log"
 ```
 
 ```
-XD> stream create --deploy true --name demo2 --definition "time | scripty --script=\"function double(a) { return a+''+a;} double(payload);\" --language=js | log"
+XD> stream create --deploy true --name demo2 --definition "time | scriptable --script=\"function double(a) { return a+''+a;} double(payload);\" --language=js | log"
 ```
