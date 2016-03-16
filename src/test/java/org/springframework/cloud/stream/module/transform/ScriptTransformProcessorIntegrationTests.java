@@ -52,9 +52,20 @@ public abstract class ScriptTransformProcessorIntegrationTests {
 
 	@Autowired
 	protected MessageCollector collector;
+
+	@WebIntegrationTest({"script=function add(a,b) { return a+b;};add(1,3)", "language=js", "variables=limit=5\\n foo=\\\\\40WORLD"})
+	public static class UsingScriptIntegrationTests extends ScriptTransformProcessorIntegrationTests {
+
+		@Test
+		public void testJavaScriptFunctions() {
+			channels.input().send(new GenericMessage<Object>("hello world"));
+			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is(4L)));
+		}
+
+	}
 	
 	@WebIntegrationTest({"script=payload.substring(0, limit as int) + foo", "variables=limit=5\\n foo=\\\\\40WORLD"})
-	public static class UsingScriptIntegrationTests extends ScriptTransformProcessorIntegrationTests {
+	public static class UsingScriptIntegrationTests4 extends ScriptTransformProcessorIntegrationTests {
 
 		@Test
 		public void testGroovyBasic() {
@@ -88,16 +99,6 @@ public abstract class ScriptTransformProcessorIntegrationTests {
 	}
 	
 
-	@WebIntegrationTest({"script=function add(a,b) { return a+b;}; add(1,3)", "language=js", "variables=limit=5\\n foo=\\\\\40WORLD"})
-	public static class UsingScriptIntegrationTests4 extends ScriptTransformProcessorIntegrationTests {
-
-		@Test
-		public void testJavaScriptFunctions() {
-			channels.input().send(new GenericMessage<Object>("hello world"));
-			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is(4L)));
-		}
-
-	}
 
 
 }
