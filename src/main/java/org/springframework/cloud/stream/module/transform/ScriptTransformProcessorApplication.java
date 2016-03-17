@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.cloud.stream.module.transform;
 
 import org.springframework.boot.SpringApplication;
@@ -22,7 +21,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * A main application that runs the Script Transform Processor as a standalone app.
  *
- * @author Eric Bottard
  * @author Andy Clement
  */
 @SpringBootApplication

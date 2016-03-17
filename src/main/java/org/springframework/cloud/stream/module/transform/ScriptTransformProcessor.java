@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.cloud.stream.module.transform;
 
 import java.util.regex.Matcher;
@@ -27,6 +26,7 @@ import org.springframework.cloud.stream.messaging.Processor;
 import org.springframework.cloud.stream.module.common.ScriptVariableGeneratorConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.io.Resource;
 import org.springframework.integration.annotation.Transformer;
 import org.springframework.integration.handler.MessageProcessor;
 import org.springframework.integration.scripting.ScriptExecutor;
@@ -34,10 +34,18 @@ import org.springframework.integration.scripting.ScriptVariableGenerator;
 import org.springframework.integration.scripting.jsr223.ScriptExecutingMessageProcessor;
 import org.springframework.integration.scripting.jsr223.ScriptExecutorFactory;
 import org.springframework.scripting.ScriptSource;
+import org.springframework.scripting.support.ResourceScriptSource;
 import org.springframework.scripting.support.StaticScriptSource;
 
 /**
- * A Processor module that transforms messages using a supplied script.
+ * A Processor module that transforms messages using a supplied script. The
+ * script is passed either directly in the script property or by reference in
+ * the script file property. If using the script file property it is not
+ * necessary to pass the language property as the language will be inferred from
+ * the script file suffix. For more information on Spring script processing, see
+ * <a href=
+ * "https://spring.io/blog/2011/12/08/spring-integration-scripting-support-part-1">
+ * this blog article</a>.
  *
  * @author Eric Bottard
  * @author Mark Fisher
@@ -48,9 +56,11 @@ import org.springframework.scripting.support.StaticScriptSource;
 @Import(ScriptVariableGeneratorConfiguration.class)
 @EnableConfigurationProperties(ScriptTransformProcessorProperties.class)
 public class ScriptTransformProcessor {
-	
+
 	private static final String NEWLINE_ESCAPE = Matcher.quoteReplacement("\\n");
-	
+
+	private static final String DOUBLE_DOUBLE_QUOTE = Matcher.quoteReplacement("\"\"");
+
 	private static Logger logger = LoggerFactory.getLogger(ScriptTransformProcessor.class);
 
 	@Autowired
@@ -62,15 +72,31 @@ public class ScriptTransformProcessor {
 	@Bean
 	@Transformer(inputChannel = Processor.INPUT, outputChannel = Processor.OUTPUT)
 	public MessageProcessor<?> transformer() {
-		String script = decodedScript(properties.getScript());
-		logger.info("script is '{}'",script);
-		ScriptSource scriptSource = new StaticScriptSource(script);
-		ScriptExecutor scriptExecutor = ScriptExecutorFactory.getScriptExecutor(properties.getLanguage());		
-		return new ScriptExecutingMessageProcessor(scriptSource, scriptVariableGenerator, scriptExecutor);				
+		String language = properties.getLanguage();
+		String script = properties.getScript();
+		Resource scriptfile = properties.getScriptfile();
+		ScriptSource scriptSource = null;
+		if (script != null) {
+			logger.info("Input script is '{}'", script);
+			scriptSource = new StaticScriptSource(decodedScript(script));
+		} else { // scriptFile!=null
+			scriptSource = new ResourceScriptSource(scriptfile);
+		}
+		ScriptExecutor scriptExecutor = ScriptExecutorFactory.getScriptExecutor(language);
+		if (scriptExecutor == null) {
+			throw new IllegalArgumentException(
+					"Unable to obtain script executor for language: " + properties.getLanguage());
+		}
+		return new ScriptExecutingMessageProcessor(scriptSource, scriptVariableGenerator, scriptExecutor);
 	}
-	
+
 	private static String decodedScript(String script) {
-		return script.replaceAll(NEWLINE_ESCAPE, "\n");
+		String possiblyDequotified = script;
+		// If it has both a leading and trailing double quote, remove them
+		if (possiblyDequotified.startsWith("\"") && possiblyDequotified.endsWith("\"")) {
+			possiblyDequotified = script.substring(1, script.length() - 1);
+		}
+		return possiblyDequotified.replaceAll(NEWLINE_ESCAPE, "\n").replaceAll(DOUBLE_DOUBLE_QUOTE, "\"");
 	}
 
 }
