@@ -74,18 +74,11 @@ public class ScriptTransformProcessor {
 	public MessageProcessor<?> transformer() {
 		String language = properties.getLanguage();
 		String script = properties.getScript();
-		Resource scriptfile = properties.getScriptfile();
-		ScriptSource scriptSource = null;
-		if (script != null) {
-			logger.info("Input script is '{}'", script);
-			scriptSource = new StaticScriptSource(decodedScript(script));
-		} else { // scriptFile!=null
-			scriptSource = new ResourceScriptSource(scriptfile);
-		}
+		logger.info("Input script is '{}'", script);
+		ScriptSource scriptSource = new StaticScriptSource(decodedScript(script));
 		ScriptExecutor scriptExecutor = ScriptExecutorFactory.getScriptExecutor(language);
 		if (scriptExecutor == null) {
-			throw new IllegalArgumentException(
-					"Unable to obtain script executor for language: " + properties.getLanguage());
+			throw new IllegalArgumentException("Unable to obtain script executor for language: " + language);
 		}
 		return new ScriptExecutingMessageProcessor(scriptSource, scriptVariableGenerator, scriptExecutor);
 	}

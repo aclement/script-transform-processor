@@ -20,9 +20,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.springframework.cloud.stream.test.matcher.MessageQueueMatcher.receivesPayloadThat;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
@@ -37,9 +35,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 /**
  * Integration Tests for the Script Transform Processor.
  *
- * @author Eric Bottard
- * @author Marius Bogoevici
- * @author Artem Bilan
  * @author Andy Clement
  */
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -55,6 +50,16 @@ public abstract class ScriptTransformProcessorIntegrationTests {
 	@Autowired
 	protected MessageCollector collector;
 
+	@WebIntegrationTest({ "script=function add(a,b) { return a+b;};add(1,3)", "language=js",
+			"variables=limit=5\\n foo=\\\\\40WORLD" })
+	public static class JavascriptScriptProperty1Tests extends ScriptTransformProcessorIntegrationTests {
+		@Test
+		public void testJavascriptFunctions() {
+			channels.input().send(new GenericMessage<Object>("hello world"));
+			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is(4L)));
+		}
+	}
+	
 	@WebIntegrationTest({ "script=payload+foo", "language=js", "variables=limit=5\\n foo=\\\\\40WORLD" })
 	public static class JavascriptScriptProperty2Tests extends ScriptTransformProcessorIntegrationTests {
 
@@ -64,16 +69,6 @@ public abstract class ScriptTransformProcessorIntegrationTests {
 			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is("hello world WORLD")));
 		}
 
-	}
-
-	@WebIntegrationTest({ "script=function add(a,b) { return a+b;};add(1,3)", "language=js",
-			"variables=limit=5\\n foo=\\\\\40WORLD" })
-	public static class JavascriptScriptProperty1Tests extends ScriptTransformProcessorIntegrationTests {
-		@Test
-		public void testJavascriptFunctions() {
-			channels.input().send(new GenericMessage<Object>("hello world"));
-			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is(4L)));
-		}
 	}
 
 	@WebIntegrationTest({ "script=payload+foo", "language=groovy", "variables=limit=5\\n foo=\\\\\40WORLD" })
@@ -131,94 +126,6 @@ public abstract class ScriptTransformProcessorIntegrationTests {
 		public void testPython() {
 			channels.input().send(new GenericMessage<Object>(6));
 			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is(30)));
-		}
-
-	}
-
-	@WebIntegrationTest({ "scriptfile=basic.py", "language=python", "variables=limit=5\\n foo=\\\\\40WORLD" })
-	public static class PythonScriptFileProperty1Tests extends ScriptTransformProcessorIntegrationTests {
-
-		@Test
-		public void testPython() {
-			channels.input().send(new GenericMessage<Object>(6));
-			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is(48)));
-		}
-
-	}
-
-	@WebIntegrationTest({ "scriptFile=basic.py", "variables=limit=5\\n foo=\\\\\40WORLD" })
-	public static class PythonScriptFileProperty2Tests extends ScriptTransformProcessorIntegrationTests {
-
-		@Test
-		public void testPython() {
-			channels.input().send(new GenericMessage<Object>(6));
-			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is(48)));
-		}
-
-	}
-
-	@WebIntegrationTest({ "scriptfile=script.groovy", "variables=limit=5\\n foo=\\\\\40WORLD" })
-	public static class GroovyScriptfileProperty1Tests extends ScriptTransformProcessorIntegrationTests {
-
-		@Test
-		public void testGroovyBasic() {
-			channels.input().send(new GenericMessage<Object>("hello world"));
-			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is("hello world WORLD")));
-		}
-
-	}
-
-	@WebIntegrationTest({ "scriptfile=script.groovy", "language=groovy", "variables=limit=5\\n foo=\\\\\40WORLD" })
-	public static class GroovyScriptfileProperty2Tests extends ScriptTransformProcessorIntegrationTests {
-
-		@Test
-		public void testGroovyBasic() {
-			channels.input().send(new GenericMessage<Object>("hello world"));
-			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is("hello world WORLD")));
-		}
-
-	}
-
-	@WebIntegrationTest({ "scriptfile=basic.rb", "language=ruby", "variables=limit=5\\n foo=\\\\\40WORLD" })
-	public static class RubyScriptfileProperty1Tests extends ScriptTransformProcessorIntegrationTests {
-
-		@Test
-		public void testRubyBasic() {
-			channels.input().send(new GenericMessage<Object>(32));
-			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is(47L)));
-		}
-
-	}
-
-	@WebIntegrationTest({ "scriptfile=basic.rb", "variables=limit=5\\n foo=\\\\\40WORLD" })
-	public static class RubyScriptfileProperty2Tests extends ScriptTransformProcessorIntegrationTests {
-
-		@Test
-		public void testRubyBasic() {
-			channels.input().send(new GenericMessage<Object>(32));
-			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is(47L)));
-		}
-
-	}
-
-	@WebIntegrationTest({ "scriptfile=basic.js", "language=js", "variables=limit=5\\n foo=\\\\\40WORLD" })
-	public static class JavascriptScriptfileProperty1Tests extends ScriptTransformProcessorIntegrationTests {
-
-		@Test
-		public void testJavascriptSimple() {
-			channels.input().send(new GenericMessage<Object>("hello world"));
-			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is("hello world3")));
-		}
-
-	}
-
-	@WebIntegrationTest({ "scriptfile=basic.js", "variables=limit=5\\n foo=\\\\\40WORLD" })
-	public static class JavascriptScriptfileProperty2Tests extends ScriptTransformProcessorIntegrationTests {
-
-		@Test
-		public void testJavascriptSimple() {
-			channels.input().send(new GenericMessage<Object>(4));
-			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is(7.0)));
 		}
 
 	}

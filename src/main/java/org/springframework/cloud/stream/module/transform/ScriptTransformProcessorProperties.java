@@ -15,8 +15,9 @@
  */
 package org.springframework.cloud.stream.module.transform;
 
+import javax.validation.constraints.NotNull;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.core.io.Resource;
 
 /**
  * Configuration properties for the Script Transform Processor module.
@@ -32,18 +33,16 @@ public class ScriptTransformProcessorProperties {
 	 * This is used to call the {@link ScriptExecutorFactory.getScriptExecutor(language)} method.
 	 * Currently supported are 'groovy' (the default), 'javascript', 'ruby' and 'python'.
 	 */
+	@NotNull
 	private String language;
 
 	/**
-	 * Reference to a script used to process messages. Specify
-	 * the script file property <b>or</b> the script property but not both.
+	 * Text of the script.  Newlines should be escaped (\\n) and double quotes
+	 * should be in pairs if the DSL parser is to let them through. If surrounded with a
+	 * pair of double quotes (to pass white space through), they will be stripped off
+	 * before processing.  Example: "return ""hello""+payload"
 	 */
-	private Resource scriptfile;
-
-	/**
-	 * The actual text of a script. Specify the script file property
-	 * <b>or</b> the script property but not both.
-	 */
+	@NotNull
 	private String script;
 
 	public String getLanguage() {
@@ -62,11 +61,4 @@ public class ScriptTransformProcessorProperties {
 		this.script = script;
 	}
 
-	public Resource getScriptfile() {
-		return scriptfile;
-	}
-
-	public void setScriptfile(Resource scriptfile) {
-		this.scriptfile = scriptfile;
-	}
 }
