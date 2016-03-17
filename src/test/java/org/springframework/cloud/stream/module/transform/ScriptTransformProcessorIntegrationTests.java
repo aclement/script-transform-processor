@@ -59,7 +59,7 @@ public abstract class ScriptTransformProcessorIntegrationTests {
 			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is(4L)));
 		}
 	}
-	
+
 	@WebIntegrationTest({ "script=payload+foo", "language=js", "variables=limit=5\\n foo=\\\\\40WORLD" })
 	public static class JavascriptScriptProperty2Tests extends ScriptTransformProcessorIntegrationTests {
 
@@ -118,16 +118,30 @@ public abstract class ScriptTransformProcessorIntegrationTests {
 
 	}
 
-	@WebIntegrationTest({ "script=\"def multiply(x,y):\\n  return x*y\\nanswer = multiply(payload,5)\\n\"",
-			"language=python", "variables=limit=5\\n foo=\\\\\40WORLD" })
-	public static class PythonScriptProperty1Tests extends ScriptTransformProcessorIntegrationTests {
-
-		@Test
-		public void testPython() {
-			channels.input().send(new GenericMessage<Object>(6));
-			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is(30)));
-		}
-
-	}
+	// Python not currently supported, problems running it in SCDF
+	
+//	@WebIntegrationTest({ "script=\"def multiply(x,y):\\n  return x*y\\nanswer = multiply(payload,5)\\n\"",
+//			"language=python", "variables=limit=5\\n foo=\\\\\40WORLD" })
+//	public static class PythonScriptProperty1Tests extends ScriptTransformProcessorIntegrationTests {
+//
+//		@Test
+//		public void testPython() {
+//			channels.input().send(new GenericMessage<Object>(6));
+//			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is(30)));
+//		}
+//
+//	}
+//	
+//	@WebIntegrationTest({ "script=\"def concat(x,y):\\n  return x+y\\nanswer = concat(\"\"hello \"\",payload)\\n\"",
+//			"language=python", "variables=limit=5\\n foo=\\\\\40WORLD" })
+//	public static class PythonScriptProperty2Tests extends ScriptTransformProcessorIntegrationTests {
+//
+//		@Test
+//		public void testPython() {
+//			channels.input().send(new GenericMessage<Object>("world"));
+//			assertThat(collector.forChannel(channels.output()), receivesPayloadThat(is("hello world")));
+//		}
+//
+//	}
 
 }

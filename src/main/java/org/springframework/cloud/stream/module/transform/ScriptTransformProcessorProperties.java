@@ -28,19 +28,26 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ScriptTransformProcessorProperties {
 
 	/**
-	 * Language of the text in the script property or the
-	 * contents of file referenced by the script file property.
-	 * This is used to call the {@link ScriptExecutorFactory.getScriptExecutor(language)} method.
-	 * Currently supported are 'groovy' (the default), 'javascript', 'ruby' and 'python'.
+	 * Language of the text in the script property. Supported: groovy, javascript, ruby.
 	 */
 	@NotNull
 	private String language;
 
+	/*
+	 * Extra notes on the script parameter. The UI will typically look after encoding newlines and double quotes
+	 * when packaging the value to pass to the script property. If not using the UI, attempting to define
+	 * a script directly in the shell for example, it is important to note:
+	 * - newlines should be escaped (\\n)
+	 * - a single " should be expressed in a pair "" - the DSL parser recognizes this
+	 * - If the script starts and ends with a " then they will be stripped off before treating what is
+	 *   left as the script.
+	 * 
+	 * Examples:
+	 * ruby: --script="return ""#{payload.upcase}"""
+	 * javascript: --script="function double(a) {\\n return a+"" + ""+a;\\n}\\ndouble(payload);"
+	 */
 	/**
-	 * Text of the script.  Newlines should be escaped (\\n) and double quotes
-	 * should be in pairs if the DSL parser is to let them through. If surrounded with a
-	 * pair of double quotes (to pass white space through), they will be stripped off
-	 * before processing.  Example: "return ""hello""+payload"
+	 * Text of the script.
 	 */
 	@NotNull
 	private String script;
